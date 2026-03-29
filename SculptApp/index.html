@@ -8,8 +8,6 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="SCULPT">
-    <meta name="mobile-web-app-capable" content="yes">
-    <link rel="apple-touch-icon" href="https://via.placeholder.com/192/5c4bc4/ffffff?text=S">
 
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     
@@ -36,52 +34,53 @@
             display: none;
             flex-direction: column;
             width: 90%; max-width: 400px;
-            margin-top: 50px;
+            margin-top: 40px;
         }
 
         .onb-step.active { display: flex; }
 
         .input-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-size: 14px; color: #9b8fd4; }
+        label { display: block; margin-bottom: 8px; font-size: 13px; color: #9b8fd4; text-transform: uppercase; letter-spacing: 1px; }
 
         .input {
-            width: 100%; padding: 12px;
+            width: 100%; padding: 14px;
             background: var(--surface-1);
             border: 1px solid var(--mid-violet);
-            border-radius: 8px; color: white;
+            border-radius: 10px; color: white;
             box-sizing: border-box;
             font-size: 16px;
         }
 
         .btn-primary {
             background: linear-gradient(90deg, #5c4bc4, #d94fc4);
-            color: white; border: none; padding: 15px;
+            color: white; border: none; padding: 16px;
             border-radius: 12px; font-weight: bold; cursor: pointer;
             font-size: 16px; margin-top: 10px;
         }
 
-        /* Chat UI */
         #chat-box {
             flex-grow: 1; overflow-y: auto;
             padding: 15px; background: var(--surface-1);
-            border-radius: 12px; margin-bottom: 10px;
+            border-radius: 12px; margin-bottom: 15px;
             border: 1px solid var(--border);
             display: flex; flex-direction: column;
-            height: 400px;
+            height: 450px;
         }
-        .msg { margin-bottom: 12px; padding: 12px; border-radius: 12px; font-size: 14px; max-width: 85%; }
-        .user-msg { background: var(--mid-violet); align-self: flex-end; color: white; }
-        .ai-msg { background: rgba(255, 255, 255, 0.1); align-self: flex-start; border: 1px solid var(--border); }
-        .chat-input-area { display: flex; gap: 8px; padding-bottom: 20px; }
+        .msg { margin-bottom: 12px; padding: 12px; border-radius: 14px; font-size: 14px; line-height: 1.4; max-width: 85%; }
+        .user-msg { background: var(--mid-violet); align-self: flex-end; color: white; border-bottom-right-radius: 2px; }
+        .ai-msg { background: rgba(255, 255, 255, 0.08); align-self: flex-start; border: 1px solid var(--border); border-bottom-left-radius: 2px; }
+        .chat-input-area { display: flex; gap: 8px; padding-bottom: 30px; width: 100%; }
     </style>
 </head>
 <body>
 
     <div class="onb-step active" id="onb-step-1">
-        <h1 style="text-align:center; font-family:'Outfit'; font-size: 42px;">SCULPT</h1>
+        <h1 style="text-align:center; font-family:'Outfit'; font-size: 48px; margin-bottom: 10px;">SCULPT</h1>
+        <p style="text-align:center; color: #9b8fd4; margin-bottom: 30px;">Premium AI Coaching</p>
+        
         <div class="input-group">
             <label>Name</label>
-            <input class="input" id="inp-name" placeholder="Your name">
+            <input class="input" id="inp-name" placeholder="Full Name">
         </div>
         <div class="input-group">
             <label>Age</label>
@@ -111,20 +110,21 @@
     </div>
 
     <div class="onb-step" id="chat-container">
-        <h2 style="font-family:'Outfit'">Coach SCULPT</h2>
+        <h2 style="font-family:'Outfit'; margin-bottom: 10px;">Coach SCULPT</h2>
         <div id="chat-box">
-            <div class="msg ai-msg">I'm ready. What's our focus for today?</div>
+            <div class="msg ai-msg">Connecting to Gemini...</div>
         </div>
         <div class="chat-input-area">
-            <input class="input" id="chat-input" placeholder="Ask anything...">
-            <button class="btn-primary" style="margin-top:0;" onclick="sendMessage()">Send</button>
+            <input class="input" id="chat-input" placeholder="Ask your coach...">
+            <button class="btn-primary" style="margin-top:0; padding: 0 20px;" onclick="sendMessage()">↑</button>
         </div>
     </div>
 
 <script type="module">
     import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
 
-    const API_KEY = "AIzaSyAewnjgOzUqwHc5fPwI9-bKOQ8cimZQROI";
+    // YOUR API KEY
+    const API_KEY = "AIzaSyAewnjgOzUqwHc5fPwI9-bKOQ8cimZQROI"; 
     const genAI = new GoogleGenerativeAI(API_KEY);
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
@@ -132,42 +132,23 @@
 
     window.onbNext = function(step) {
         const current = document.getElementById('onb-step-' + step);
-        let next;
+        const next = (step === 2) ? document.getElementById('chat-container') : document.getElementById('onb-step-' + (step + 1));
 
-        // Smart-find the next screen
-        if (step === 2) {
-            next = document.getElementById('chat-container');
-        } else {
-            next = document.getElementById('onb-step-' + (step + 1));
-        }
-
-        // --- FINAL SAFETY CHECK ---
-        if (!current) {
-            console.error("Missing current step ID");
-            return;
-        }
-        if (!next) {
-            alert("Error: Next screen not found. Checking for 'chat-container'...");
-            next = document.getElementById('chat-container'); // Last resort attempt
-            if (!next) {
-                alert("Critical Error: 'chat-container' ID is missing from your HTML.");
-                return;
-            }
-        }
-
-        // Data Capture
         if (step === 1) {
             userData.name = document.getElementById('inp-name').value;
             userData.age = document.getElementById('inp-age').value;
             userData.gender = document.getElementById('inp-gender').value;
+            if(!userData.name) { alert("Please enter your name."); return; }
         } else if (step === 2) {
             userData.weight = document.getElementById('inp-weight').value;
             userData.height = document.getElementById('inp-height').value;
+            
+            // Initializing message
+            const box = document.getElementById('chat-box');
+            box.innerHTML = `<div class="msg ai-msg">Hello ${userData.name}! I'm your AI Coach. I'm calibrated for your ${userData.weight}kg frame. How can I help today?</div>`;
         }
 
-        // UI Switch
         current.style.display = 'none';
-        current.classList.remove('active');
         next.style.display = 'flex';
         next.classList.add('active');
         window.scrollTo(0,0);
@@ -176,21 +157,26 @@
     window.sendMessage = async function() {
         const input = document.getElementById('chat-input');
         const box = document.getElementById('chat-box');
-        if (!input.value.trim()) return;
+        const text = input.value.trim();
+        if (!text) return;
 
-        const userText = input.value;
-        box.innerHTML += `<div class="msg user-msg">${userText}</div>`;
+        box.innerHTML += `<div class="msg user-msg">${text}</div>`;
         input.value = "";
         box.scrollTop = box.scrollHeight;
 
         try {
-            const context = `You are SCULPT AI. Client: ${userData.name}, ${userData.age}yo ${userData.gender}, ${userData.weight}kg.`;
-            const result = await model.generateContent(context + " Question: " + userText);
+            const prompt = `User: ${userData.name}, ${userData.age}yo ${userData.gender}, ${userData.weight}kg. Question: ${text}`;
+            const result = await model.generateContent(prompt);
             const response = await result.response;
+            
             box.innerHTML += `<div class="msg ai-msg">${response.text()}</div>`;
             box.scrollTop = box.scrollHeight;
         } catch (e) {
-            box.innerHTML += `<div class="msg ai-msg">Error: ${e.message}</div>`;
+            console.error("Gemini Error:", e);
+            box.innerHTML += `<div class="msg ai-msg" style="border: 1px solid #ff4d4d; color: #ffbcbc;">
+                <b>API ERROR:</b> ${e.message}<br><br>
+                <i>Tip: Go to Google AI Studio and ensure your key is enabled for 'Generative Language API'.</i>
+            </div>`;
         }
     };
 </script>
