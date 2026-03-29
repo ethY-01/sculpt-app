@@ -121,12 +121,12 @@
 <script type="module">
     import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
 
-    // Update with your latest API Key from Google AI Studio
+    // Your API Key
     const API_KEY = "AIzaSyAewnjgOzUqwHc5fPwI9-bKOQ8cimZQROI"; 
     const genAI = new GoogleGenerativeAI(API_KEY);
     
-    // MODEL NAME FIX: Added "-latest" suffix to resolve 404
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
+    // UPDATED MODEL NAME: gemini-pro is the most stable string
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
     let userData = { name: "", age: "", gender: "", weight: "", height: "" };
 
@@ -142,7 +142,7 @@
             userData.weight = document.getElementById('inp-weight').value;
             userData.height = document.getElementById('inp-height').value;
             const box = document.getElementById('chat-box');
-            box.innerHTML = `<div class="msg ai-msg">Ready for you, ${userData.name}. Ask me anything about your routine.</div>`;
+            box.innerHTML = `<div class="msg ai-msg">Ready for you, ${userData.name}. Ask me about your routine.</div>`;
         }
 
         current.style.display = 'none';
@@ -162,17 +162,18 @@
         box.scrollTop = box.scrollHeight;
 
         try {
-            const context = `Context: Client is a ${userData.age}yo ${userData.gender}, ${userData.weight}kg. Request: ${text}`;
-            const result = await model.generateContent(context);
+            // Adding context based on your weight and height goals
+            const prompt = `Client: ${userData.age}yo ${userData.gender}, ${userData.weight}kg. Goal: ${text}`;
+            const result = await model.generateContent(prompt);
             const response = await result.response;
             
             box.innerHTML += `<div class="msg ai-msg">${response.text()}</div>`;
             box.scrollTop = box.scrollHeight;
         } catch (e) {
-            console.error(e);
+            console.error("Gemini Connection Error:", e);
             box.innerHTML += `<div class="msg ai-msg" style="color:#ffbcbc; border: 1px solid #ff4d4d;">
                 <b>API Error:</b> ${e.message}<br><br>
-                <i>Tip: If 404 persists, edit line 124 to use "gemini-pro" instead of "gemini-1.5-flash-latest".</i>
+                <i>Tip: Check your internet or ensure your API key hasn't been restricted in Google AI Studio.</i>
             </div>`;
         }
     };
