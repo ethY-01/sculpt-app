@@ -40,7 +40,7 @@
         .onb-step.active { display: flex; }
 
         .input-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-size: 13px; color: #9b8fd4; text-transform: uppercase; letter-spacing: 1px; }
+        label { display: block; margin-bottom: 8px; font-size: 13px; color: #9b8fd4; text-transform: uppercase; }
 
         .input {
             width: 100%; padding: 14px;
@@ -67,17 +67,15 @@
             height: 450px;
         }
         .msg { margin-bottom: 12px; padding: 12px; border-radius: 14px; font-size: 14px; line-height: 1.4; max-width: 85%; }
-        .user-msg { background: var(--mid-violet); align-self: flex-end; color: white; border-bottom-right-radius: 2px; }
-        .ai-msg { background: rgba(255, 255, 255, 0.08); align-self: flex-start; border: 1px solid var(--border); border-bottom-left-radius: 2px; }
+        .user-msg { background: var(--mid-violet); align-self: flex-end; color: white; }
+        .ai-msg { background: rgba(255, 255, 255, 0.08); align-self: flex-start; border: 1px solid var(--border); }
         .chat-input-area { display: flex; gap: 8px; padding-bottom: 30px; width: 100%; }
     </style>
 </head>
 <body>
 
     <div class="onb-step active" id="onb-step-1">
-        <h1 style="text-align:center; font-family:'Outfit'; font-size: 48px; margin-bottom: 10px;">SCULPT</h1>
-        <p style="text-align:center; color: #9b8fd4; margin-bottom: 30px;">Premium AI Coaching</p>
-        
+        <h1 style="text-align:center; font-family:'Outfit'; font-size: 48px;">SCULPT</h1>
         <div class="input-group">
             <label>Name</label>
             <input class="input" id="inp-name" placeholder="Full Name">
@@ -112,7 +110,7 @@
     <div class="onb-step" id="chat-container">
         <h2 style="font-family:'Outfit'; margin-bottom: 10px;">Coach SCULPT</h2>
         <div id="chat-box">
-            <div class="msg ai-msg">Connecting to Gemini...</div>
+            <div class="msg ai-msg">Waiting for connection...</div>
         </div>
         <div class="chat-input-area">
             <input class="input" id="chat-input" placeholder="Ask your coach...">
@@ -123,7 +121,7 @@
 <script type="module">
     import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
 
-    // YOUR API KEY
+    // PASTE YOUR NEW KEY HERE
     const API_KEY = "AIzaSyAewnjgOzUqwHc5fPwI9-bKOQ8cimZQROI"; 
     const genAI = new GoogleGenerativeAI(API_KEY);
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
@@ -138,14 +136,11 @@
             userData.name = document.getElementById('inp-name').value;
             userData.age = document.getElementById('inp-age').value;
             userData.gender = document.getElementById('inp-gender').value;
-            if(!userData.name) { alert("Please enter your name."); return; }
         } else if (step === 2) {
             userData.weight = document.getElementById('inp-weight').value;
             userData.height = document.getElementById('inp-height').value;
-            
-            // Initializing message
             const box = document.getElementById('chat-box');
-            box.innerHTML = `<div class="msg ai-msg">Hello ${userData.name}! I'm your AI Coach. I'm calibrated for your ${userData.weight}kg frame. How can I help today?</div>`;
+            box.innerHTML = `<div class="msg ai-msg">Ready for you, ${userData.name}. Ask me anything.</div>`;
         }
 
         current.style.display = 'none';
@@ -165,18 +160,15 @@
         box.scrollTop = box.scrollHeight;
 
         try {
-            const prompt = `User: ${userData.name}, ${userData.age}yo ${userData.gender}, ${userData.weight}kg. Question: ${text}`;
-            const result = await model.generateContent(prompt);
+            // Using a simple prompt first to test the connection
+            const result = await model.generateContent(text);
             const response = await result.response;
             
             box.innerHTML += `<div class="msg ai-msg">${response.text()}</div>`;
             box.scrollTop = box.scrollHeight;
         } catch (e) {
-            console.error("Gemini Error:", e);
-            box.innerHTML += `<div class="msg ai-msg" style="border: 1px solid #ff4d4d; color: #ffbcbc;">
-                <b>API ERROR:</b> ${e.message}<br><br>
-                <i>Tip: Go to Google AI Studio and ensure your key is enabled for 'Generative Language API'.</i>
-            </div>`;
+            console.error(e);
+            box.innerHTML += `<div class="msg ai-msg" style="color:#ffbcbc;"><b>Verification Error:</b> ${e.message}</div>`;
         }
     };
 </script>
