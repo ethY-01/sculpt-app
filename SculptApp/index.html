@@ -2048,7 +2048,24 @@ function renderMacroBars(eaten,prot,carb,fatOrN,nOrDetailed,detailed){
       <div class="macro-bar-track"><div class="macro-bar-fill" style="width:${Math.min(100,Math.round(f/Math.max(1,nutrition.fat||1)*100))}%"></div></div>
     </div>`;
 }
+function onbNext(step) {
+    // 1. Get the current step and next step elements
+    const currentStep = document.getElementById('onb-step-1'); // Make sure your first div has this ID
+    const nextStep = document.getElementById('onb-step-2');
 
+    // 2. Simple Validation (Optional but recommended)
+    const name = document.getElementById('inp-name').value;
+    if (!name) {
+        alert("Please enter your name first!");
+        return;
+    }
+
+    // 3. Switch Visibility
+    if (nextStep) {
+        currentStep.style.display = 'none';
+        nextStep.style.display = 'block';
+    }
+}
 // ════════════════════════════════════════════════
 // START
 // ════════════════════════════════════════════════
